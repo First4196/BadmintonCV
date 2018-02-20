@@ -319,7 +319,7 @@ Point2f getMean(vector<Point2f> &vec){
     return Point2f(sumX/vec.size(), sumY/vec.size());
 }
 
-tuple<Point2f,Point2f> median2(Mat &fgImg){
+tuple<Point2f,Point2f> twoMeans(Mat &fgImg){
     Point2f centerN(WIDTH/2, HEIGHT/5), centerS(WIDTH/2, HEIGHT*4/5); 
     vector<Point2f> points;
     for(int x=0; x<WIDTH; x++){
@@ -431,7 +431,7 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             erode(fgImg,fgImg,kernel);
             erode(fgImg,fgImg,kernel);
             Point2f centerN, centerS;
-            tie(centerN,centerS) = median2(fgImg);
+            tie(centerN,centerS) = twoMeans(fgImg);
 
             fgColorImg = Mat::zeros( Size(WIDTH, HEIGHT), CV_8UC3);
 
