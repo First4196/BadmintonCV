@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -10,6 +11,7 @@ using namespace std;
 int WIDTH = 500;
 int HEIGHT = 500;
 int MIN_GAP = 120;
+ofstream myfile;
 
 Mat kernel = getStructuringElement(MORPH_ELLIPSE,Size(3,3),Point(1,1));
 
@@ -391,8 +393,10 @@ Rect getBoundingBox(Point2f center, vector<Point2f> &points){
 
 void showVideo(const char* path, int lo=0, int hi=2e9){
 
-    ofstream outfile("detected.txt");
+    // ofstream outfile("detected.txt");
 
+    myfile.open ("data.csv");
+    myfile << "frame,xN,yN,wN,hN,xS,yS,wS,hS\n";
     VideoCapture capture(path);
     Mat frame;
     vector<Mat> frames;
@@ -504,31 +508,34 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             circle(topView, Point2f(transformedFeetS.x+50, transformedFeetS.y+50), 2, Scalar(255,0,0), 2);
             imshow("TopView", topView);
             
-            string s = to_string(i) + " ";
-            
-            s += to_string(boundingBoxN.x) + " ";
-            s += to_string(boundingBoxN.y) + " ";
-            s += to_string(boundingBoxN.width) + " ";
-            s += to_string(boundingBoxN.height) + " ";
 
-            s += to_string(boundingBoxS.x) + " ";
-            s += to_string(boundingBoxS.y) + " ";
-            s += to_string(boundingBoxS.width) + " ";
-            s += to_string(boundingBoxS.height) + " ";
+            if(i % 5 == 0) {
+                string s;
+                s += to_string(i) + ",";
+                // s += to_string(boundingBoxN.x) + " ";
+                // s += to_string(boundingBoxN.y) + " ";
+                s += to_string(transformedFeetN.x) + ",";
+                s += to_string(transformedFeetN.y) + ",";
+                s += to_string(boundingBoxN.width) + ",";
+                s += to_string(boundingBoxN.height) + ",";
 
-            s += to_string(transformedFeetN.x) + " ";
-            s += to_string(transformedFeetN.y) + " ";
+                // s += to_string(boundingBoxS.x) + " ";
+                // s += to_string(boundingBoxS.y) + " ";
+                s += to_string(transformedFeetS.x) + ",";
+                s += to_string(transformedFeetS.y) + ",";
+                s += to_string(boundingBoxS.width) + ",";
+                s += to_string(boundingBoxS.height) + "\n";
 
-            s += to_string(transformedFeetS.x) + " ";
-            s += to_string(transformedFeetS.y) + "\n";
 
-            outfile << s;
 
+                // outfile << s;
+                myfile << s;
+            }
             waitKey(20);
         }
     }
 
-    outfile.close();
+    myfile.close();
 
 }
 
