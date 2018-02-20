@@ -1,3 +1,0 @@
-/home/thanapatk/Workspace/MiniProjectCV/Badminton/CMakeFiles/rebuild_cache.dir
-/home/thanapatk/Workspace/MiniProjectCV/Badminton/CMakeFiles/main.dir
-/home/thanapatk/Workspace/MiniProjectCV/Badminton/CMakeFiles/edit_cache.dir
