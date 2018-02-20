@@ -452,19 +452,22 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             Rect boundingBoxN = getBoundingBox(centerN,pointCenterN);
             Rect boundingBoxS = getBoundingBox(centerS,pointCenterS);
 
+            Point2f feetN(centerN.x, centerN.y*0.2+boundingBoxN.br().y*0.8);
+            Point2f feetS(centerS.x, centerS.y*0.2+boundingBoxS.br().y*0.8);
+
             for(Point2f point : pointCenterN){
                 circle(fgColorImg, point, 1, Scalar(0,255,255), 1);
             }
             rectangle(fgColorImg, boundingBoxN, Scalar(255,0,0), 2);
             //circle(fgColorImg, centerN, 2, Scalar(255,0,0), 2);
-            circle(fgColorImg, Point2f(centerN.x, centerN.y*0.2+boundingBoxN.br().y*0.8), 2, Scalar(255,0,0), 2);
+            circle(fgColorImg, feetN, 2, Scalar(255,0,0), 2);
             
             for(Point2f point : pointCenterS){
                 circle(fgColorImg, point, 1, Scalar(255,0,255), 1);
             }
             rectangle(fgColorImg, boundingBoxS, Scalar(255,0,0), 2);
             //circle(fgColorImg, centerS, 2, Scalar(255,0,0), 2);
-            circle(fgColorImg, Point2f(centerS.x, centerS.y*0.2+boundingBoxS.br().y*0.8), 2, Scalar(255,0,0), 2);
+            circle(fgColorImg, feetS, 2, Scalar(255,0,0), 2);
             
             //imshow("fgColorImg", fgColorImg);
             
@@ -472,12 +475,29 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             yellow.copyTo(frame,bestCourtImg);
             
             rectangle(frame, boundingBoxN, Scalar(255,0,0), 2);
-            circle(frame, Point2f(centerN.x, centerN.y*0.2+boundingBoxN.br().y*0.8), 2, Scalar(255,0,0), 2);
+            circle(frame, feetN, 2, Scalar(255,0,0), 2);
             
             rectangle(frame, boundingBoxS, Scalar(255,0,0), 2);
-            circle(frame, Point2f(centerS.x, centerS.y*0.2+boundingBoxS.br().y*0.8), 2, Scalar(255,0,0), 2);
+            circle(frame, feetS, 2, Scalar(255,0,0), 2);
 
             imshow(path, frame);
+
+            vector<Point2f> bestCorners({bestNW,bestNE,bestSW,bestSE});
+            Mat homoMat = getPerspectiveTransform(bestCorners, courtCorners);
+            Mat topView = Mat::zeros(Size(300,540), CV_8UC3);
+            vector<Point2f> points({feetN, feetS}), transformedPoints;
+            perspectiveTransform(points, transformedPoints, homoMat);
+            for(auto &l : courtLines){
+                drawWhiteLine(topView, Vec4f(l[0]+50,l[1]+50,l[2]+50,l[3]+50));
+            }
+            Vec4f l = middleCourtLine;
+            drawWhiteLine(topView, Vec4f(l[0]+50,l[1]+50,l[2]+50,l[3]+50));
+            Point2f transformedFeetN = transformedPoints[0];
+            Point2f transformedFeetS = transformedPoints[1];
+            circle(topView, Point2f(transformedFeetN.x+50, transformedFeetN.y+50), 2, Scalar(255,0,0), 2);
+            circle(topView, Point2f(transformedFeetS.x+50, transformedFeetS.y+50), 2, Scalar(255,0,0), 2);
+            imshow("TopView", topView);
+            
             waitKey(20);
         }
     }
