@@ -36,6 +36,9 @@ vector<Vec4f> courtLines({
 });
 Vec4f middleCourtLine({0,220,200,220});
 
+Rect boundingBoxN, boundingBoxS;
+Point2f transformedFeetN, transformedFeetS;
+
 double bestScore = -INFINITY;
 Point2f bestNW, bestNE, bestSW, bestSE;
 Rect bestCourtROI;
@@ -387,6 +390,9 @@ Rect getBoundingBox(Point2f center, vector<Point2f> &points){
 }
 
 void showVideo(const char* path, int lo=0, int hi=2e9){
+
+    ofstream outfile("detected.txt");
+
     VideoCapture capture(path);
     Mat frame;
     vector<Mat> frames;
@@ -449,8 +455,8 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
                 }
             }
 
-            Rect boundingBoxN = getBoundingBox(centerN,pointCenterN);
-            Rect boundingBoxS = getBoundingBox(centerS,pointCenterS);
+            boundingBoxN = getBoundingBox(centerN,pointCenterN);
+            boundingBoxS = getBoundingBox(centerS,pointCenterS);
 
             Point2f feetN(centerN.x, centerN.y*0.2+boundingBoxN.br().y*0.8);
             Point2f feetS(centerS.x, centerS.y*0.2+boundingBoxS.br().y*0.8);
@@ -492,15 +498,38 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             }
             Vec4f l = middleCourtLine;
             drawWhiteLine(topView, Vec4f(l[0]+50,l[1]+50,l[2]+50,l[3]+50));
-            Point2f transformedFeetN = transformedPoints[0];
-            Point2f transformedFeetS = transformedPoints[1];
+            transformedFeetN = transformedPoints[0];
+            transformedFeetS = transformedPoints[1];
             circle(topView, Point2f(transformedFeetN.x+50, transformedFeetN.y+50), 2, Scalar(255,0,0), 2);
             circle(topView, Point2f(transformedFeetS.x+50, transformedFeetS.y+50), 2, Scalar(255,0,0), 2);
             imshow("TopView", topView);
             
+            string s = to_string(i) + " ";
+            
+            s += to_string(boundingBoxN.x) + " ";
+            s += to_string(boundingBoxN.y) + " ";
+            s += to_string(boundingBoxN.width) + " ";
+            s += to_string(boundingBoxN.height) + " ";
+
+            s += to_string(boundingBoxS.x) + " ";
+            s += to_string(boundingBoxS.y) + " ";
+            s += to_string(boundingBoxS.width) + " ";
+            s += to_string(boundingBoxS.height) + " ";
+
+            s += to_string(transformedFeetN.x) + " ";
+            s += to_string(transformedFeetN.y) + " ";
+
+            s += to_string(transformedFeetS.x) + " ";
+            s += to_string(transformedFeetS.y) + "\n";
+
+            outfile << s;
+
             waitKey(20);
         }
     }
+
+    outfile.close();
+
 }
 
 void processVideo(const char* path, int lo=0, int hi=2e9){
