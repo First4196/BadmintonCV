@@ -394,8 +394,9 @@ Rect getBoundingBox(Point2f center, vector<Point2f> &points){
 void showVideo(const char* path, int lo=0, int hi=2e9){
 
 
-    // myfile.open ("data.csv");
-    // myfile << "frame,xN,yN,wN,hN,xS,yS,wS,hS\n";
+    // outfile.open ("data.csv");
+    // outfile << "frame,xN,yN,wN,hN,xS,yS,wS,hS\n";
+
     VideoCapture capture(path);
     Mat frame;
     vector<Mat> frames;
@@ -509,6 +510,7 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
             
 
             if(i % 5 == 0) {
+
                 string s;
                 s += to_string(i) + ",";
                 // s += to_string(boundingBoxN.x) + " ";
@@ -525,16 +527,13 @@ void showVideo(const char* path, int lo=0, int hi=2e9){
                 s += to_string(boundingBoxS.width) + ",";
                 s += to_string(boundingBoxS.height) + "\n";
 
-
-
-            
-                // myfile << s;
+                // outfile << s;
             }
             waitKey(20);
         }
     }
 
-    // myfile.close();
+    // outfile.close();
 
 }
 
